@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item?.itemId){
             R.id.action_map ->
-               startActivity(Intent(this, MapsActivity::class.java))
+               startActivity(Intent(this, MapaActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }

@@ -57,6 +57,11 @@ android {
     val firestore_version = "24.8.1"
     val lifecycle_version="2.5.1"
     val storage_version = "20.2.1"
+    val maps_version = "18.2.0"
+    val services_auth_version = "21.1.0"
+    val services_location = "21.2.0"
+    val coroutines_version = "1.3.9"
+    val coroutines_core_version = "1.5.0"
 
 dependencies {
 
@@ -64,7 +69,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:$app_compat_version")
     implementation("com.google.android.material:material:$material_version")
     implementation("androidx.constraintlayout:constraintlayout:$constraint_layout_version")
-    implementation("com.google.android.gms:play-services-auth:21.1.0")
+    implementation("com.google.android.gms:play-services-auth:$services_auth_version")
+
 
 
     implementation("com.github.bumptech.glide:glide:$glide_version")
@@ -90,6 +96,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-service:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
+
+    implementation("com.google.android.gms:play-services-maps:$maps_version")
+    implementation("com.google.android.gms:play-services-location:$services_location")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_core_version")
 
     testImplementation("junit:junit:$junit_version")
     androidTestImplementation("androidx.test.ext:junit:$test_junit_version")
