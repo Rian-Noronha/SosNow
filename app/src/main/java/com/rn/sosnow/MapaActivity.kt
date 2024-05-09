@@ -1,13 +1,14 @@
 package com.rn.sosnow
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,9 +16,10 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.rn.sosnow.databinding.ActivityMapaBinding
 import com.rn.sosnow.viewmodels.MapViewModel
-import android.Manifest
 
 class MapaActivity : AppCompatActivity() {
+
+    private var isGpsDialogOpened: Boolean = false
 
     private lateinit var binding: ActivityMapaBinding
 
@@ -32,6 +34,12 @@ class MapaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMapaBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG)?:false
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(EXTRA_GPS_DIALOG, isGpsDialogOpened)
     }
     override fun onStart() {
         super.onStart()
@@ -51,6 +59,14 @@ class MapaActivity : AppCompatActivity() {
         if (requestCode == REQUEST_ERROR_PLAY_SERVICES &&
             resultCode == Activity.RESULT_OK) {
             viewModel.connectGoogleApiClient()
+        }else if(requestCode == REQUEST_CHECK_GPS){
+            isGpsDialogOpened = false
+            if(resultCode == RESULT_OK){
+                loadLastLocation()
+            }else{
+                Toast.makeText(this, R.string.map_error_gps_disabled, Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -91,6 +107,17 @@ class MapaActivity : AppCompatActivity() {
             when (error) {
                 is MapViewModel.LocationError.ErrorLocationUnavailable ->
                     showError(R.string.map_error_get_current_location)
+
+                is MapViewModel.LocationError.GpsDisabled -> {
+                    if(!isGpsDialogOpened){
+                        isGpsDialogOpened = true
+                        error.exception.startResolutionForResult(
+                            this, MapaActivity.REQUEST_CHECK_GPS)
+                    }
+                }
+
+                is MapViewModel.LocationError.GpsSettingUnavailable ->
+                    showError(R.string.map_error_gps_settings)
             }
         }
     }
@@ -133,6 +160,8 @@ class MapaActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_ERROR_PLAY_SERVICES = 1
         private const val REQUEST_PERMISSIONS = 2
+        private const val REQUEST_CHECK_GPS = 3
+        private const val EXTRA_GPS_DIALOG = "gpsDialogIsOpen"
     }
 
 
