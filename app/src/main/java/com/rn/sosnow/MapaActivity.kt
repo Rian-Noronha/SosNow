@@ -5,7 +5,10 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.location.Address
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -101,7 +104,48 @@ class MapaActivity : AppCompatActivity() {
                 handleLocationError(error)
             })
 
+        viewModel.isLoading()
+            .observe(this, Observer { value ->
+                if(value != null){
+                    binding.btnSearch.isEnabled = !value
+                    if(value){
+                        showProgress(getString(R.string.map_msg_search_address))
+                    }else{
+                        hideProgress()
+                    }
+                }
+            })
+
+        viewModel.getAddresses()
+            .observe(this, Observer { addresses ->
+                if(addresses != null){
+                    showAddressListDialog(addresses)
+                }
+            })
+        binding.btnSearch.setOnClickListener{
+            searchAddress()
+        }
     }
+
+    private fun searchAddress(){
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
+        viewModel.searchAddress(binding.edtSearch.text.toString())
+    }
+
+    private fun showProgress(message: String){
+        binding.layoutLoading.txtProgress.text = message
+        binding.layoutLoading.llProgress.visibility = View.VISIBLE
+    }
+
+    private fun hideProgress(){
+        binding.layoutLoading.llProgress.visibility = View.GONE
+    }
+
+    private fun showAddressListDialog(addresses: List<Address>){
+        AddressListFragment.newInstance(addresses).show(supportFragmentManager, null)
+    }
+
     private fun handleLocationError(error: MapViewModel.LocationError?) {
         if (error != null) {
             when (error) {

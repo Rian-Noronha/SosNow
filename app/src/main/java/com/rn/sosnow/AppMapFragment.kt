@@ -1,11 +1,15 @@
 package com.rn.sosnow
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rn.sosnow.viewmodels.MapViewModel
 
@@ -25,7 +29,19 @@ class AppMapFragment : SupportMapFragment() {
     }
 
     private fun setupMap(){
+
         googleMap?.run{
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            isMyLocationEnabled = true
             mapType = GoogleMap.MAP_TYPE_NORMAL
             uiSettings.isMapToolbarEnabled= false
             uiSettings.isZoomControlsEnabled = true
@@ -42,14 +58,31 @@ class AppMapFragment : SupportMapFragment() {
     private fun updateMap(mapState: MapViewModel.MapState){
         googleMap?.run {
             clear()
+            val area = LatLngBounds.Builder()
             val origin = mapState.origin
             if(origin != null){
                 addMarker(MarkerOptions()
                     .position(origin)
-                    .title("Local atual"))
-                animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 17.0f))
-
+                    .title(getString(R.string.map_marker_origin)))
+                area.include(origin)
             }
+
+            val destination = mapState.destination
+            if(destination != null){
+                addMarker(MarkerOptions()
+                    .position(destination)
+                    .title(getString(R.string.map_marker_destination)))
+                area.include(destination)
+            }
+
+            if(origin != null){
+                if(destination != null){
+                    animateCamera(CameraUpdateFactory.newLatLngBounds(area.build(), 50))
+                }else{
+                    animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 17f))
+                }
+            }
+
         }
     }
 }
