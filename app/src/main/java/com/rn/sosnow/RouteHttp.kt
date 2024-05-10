@@ -4,22 +4,13 @@ import com.google.maps.android.PolyUtil
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import java.util.Locale
 
 object RouteHttp {
-
-    private const val MAPS_API_KEY = "AIzaSyBZ0bE1qwRkjhJVAQuWsqSqmlEKleYbXoc"
-
+    private const val key = "AIzaSyAbE0ADJpvOT2YHY4GnF4sqlyXqc0bNSBc"
     fun searchRoute(orig: LatLng, dest: LatLng): List<LatLng>? {
         try {
-            val urlRoute = String.format(Locale.US,
-                "https://maps.googleapis.com/maps/api/directions/json?" +
-                        "origin=%f,%f&destination=%f,%f&" +
-                        "sensor=true&mode=driving&key=%s",
-                orig.latitude, orig.longitude,
-                dest.latitude, dest.longitude,
-                MAPS_API_KEY)
 
+            val urlRoute = "https://maps.googleapis.com/maps/api/directions/json?origin=${orig.latitude},${orig.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=true&mode=driving&key=$key"
             val client = OkHttpClient()
             val request = Request.Builder()
                 .url(urlRoute)
@@ -27,8 +18,8 @@ object RouteHttp {
 
             val response = client.newCall(request).execute()
             val result = response.body?.string()
-            val json = JSONObject(result)
-            val jsonRoute = json.getJSONArray("routes").getJSONObject(0)
+            val json = result?.let { JSONObject(it) }
+            val jsonRoute = json!!.getJSONArray("routes").getJSONObject(0)
             val leg = jsonRoute.getJSONArray("legs").getJSONObject(0)
             val steps = leg.getJSONArray("steps")
             val numSteps = steps.length()
@@ -46,6 +37,4 @@ object RouteHttp {
         }
         return null
     }
-
-
 }

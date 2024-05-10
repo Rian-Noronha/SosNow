@@ -18,6 +18,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -41,6 +42,14 @@ android {
         dataBinding = true
         viewBinding = true
     }
+
+    secrets{
+        propertiesFileName = "secrets.properties"
+        defaultPropertiesFileName = "local.defaults.properties"
+        ignoreList.add("keyToIgnore")
+        ignoreList.add("sdk.*")
+    }
+
 }
 
     val glide_version = "4.16.0"
@@ -64,6 +73,8 @@ android {
     val coroutines_core_version = "1.5.0"
     val maps_utils_version = "2.3.0"
     val okhttp_version = "4.10.0"
+    val gson_version = "2.10.1"
+    val secrets_version = "2.0.1"
 
 dependencies {
 
@@ -108,6 +119,9 @@ dependencies {
     implementation("com.google.maps.android:android-maps-utils:$maps_utils_version")
 
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
+    implementation("com.google.code.gson:gson:$gson_version")
+
+    implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:$secrets_version")
 
     testImplementation("junit:junit:$junit_version")
     androidTestImplementation("androidx.test.ext:junit:$test_junit_version")

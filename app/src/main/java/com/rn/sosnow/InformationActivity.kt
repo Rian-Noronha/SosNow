@@ -1,5 +1,4 @@
 package com.rn.sosnow
-
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -17,32 +16,26 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.rn.sosnow.databinding.ActivityMapaBinding
+import com.rn.sosnow.databinding.ActivityInformationBinding
 import com.rn.sosnow.viewmodels.MapViewModel
 
-class MapaActivity : AppCompatActivity() {
 
-    private var isGpsDialogOpened: Boolean = false
-
-    private lateinit var binding: ActivityMapaBinding
-
+class InformationActivity : AppCompatActivity() {
     private val viewModel: MapViewModel by lazy {
         ViewModelProvider(this).get(MapViewModel::class.java)
     }
     private val fragment: AppMapFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.fragmentMap) as AppMapFragment
     }
+    private var isGpsDialogOpened: Boolean = false
+
+    private lateinit var binding: ActivityInformationBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMapaBinding.inflate(layoutInflater)
+        binding = ActivityInformationBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG)?:false
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState?.putBoolean(EXTRA_GPS_DIALOG, isGpsDialogOpened)
+        isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG) ?: false
     }
     override fun onStart() {
         super.onStart()
@@ -54,19 +47,24 @@ class MapaActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         viewModel.disconnectGoogleApiClient()
+        viewModel.stopLocationUpdates()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(EXTRA_GPS_DIALOG, isGpsDialogOpened)
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_ERROR_PLAY_SERVICES &&
             resultCode == Activity.RESULT_OK) {
             viewModel.connectGoogleApiClient()
-        }else if(requestCode == REQUEST_CHECK_GPS){
+        } else if (requestCode == REQUEST_CHECK_GPS) {
             isGpsDialogOpened = false
-            if(resultCode == RESULT_OK){
+            if (resultCode == RESULT_OK) {
                 loadLastLocation()
-            }else{
+            } else {
                 Toast.makeText(this, R.string.map_error_gps_disabled, Toast.LENGTH_SHORT).show()
                 finish()
             }
@@ -103,76 +101,51 @@ class MapaActivity : AppCompatActivity() {
             .observe(this, Observer { error ->
                 handleLocationError(error)
             })
-
         viewModel.isLoading()
             .observe(this, Observer { value ->
-                if(value != null){
+                if (value != null) {
                     binding.btnSearch.isEnabled = !value
-                    if(value){
+                    if (value) {
                         showProgress(getString(R.string.map_msg_search_address))
-                    }else{
-                        hideProgress()
+                    } else {
+                        hidePogress()
                     }
                 }
             })
-
         viewModel.getAddresses()
             .observe(this, Observer { addresses ->
-                if(addresses != null){
+                if (addresses != null) {
                     showAddressListDialog(addresses)
                 }
             })
-
         viewModel.isLoadingRoute()
             .observe(this, Observer { value ->
-                if(value != null){
+                if (value != null) {
                     binding.btnSearch.isEnabled = !value
-                    if(value){
+                    if (value) {
                         showProgress(getString(R.string.map_msg_search_route))
-                    }else{
-                        hideProgress()
+                    } else {
+                        hidePogress()
                     }
                 }
             })
 
-        binding.btnSearch.setOnClickListener{
+        binding.btnSearch.setOnClickListener {
             searchAddress()
         }
     }
-
-    private fun searchAddress(){
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
-        viewModel.searchAddress(binding.edtSearch.text.toString())
-    }
-
-    private fun showProgress(message: String){
-        binding.layoutLoading.txtProgress.text = message
-        binding.layoutLoading.llProgress.visibility = View.VISIBLE
-    }
-
-    private fun hideProgress(){
-        binding.layoutLoading.llProgress.visibility = View.GONE
-    }
-
-    private fun showAddressListDialog(addresses: List<Address>){
-        AddressListFragment.newInstance(addresses).show(supportFragmentManager, null)
-    }
-
     private fun handleLocationError(error: MapViewModel.LocationError?) {
         if (error != null) {
             when (error) {
                 is MapViewModel.LocationError.ErrorLocationUnavailable ->
                     showError(R.string.map_error_get_current_location)
-
                 is MapViewModel.LocationError.GpsDisabled -> {
-                    if(!isGpsDialogOpened){
+                    if (!isGpsDialogOpened) {
                         isGpsDialogOpened = true
                         error.exception.startResolutionForResult(
-                            this, MapaActivity.REQUEST_CHECK_GPS)
+                            this, InformationActivity.REQUEST_CHECK_GPS)
                     }
                 }
-
                 is MapViewModel.LocationError.GpsSettingUnavailable ->
                     showError(R.string.map_error_gps_settings)
             }
@@ -191,7 +164,7 @@ class MapaActivity : AppCompatActivity() {
         if (result.hasResolution()) {
             try {
                 result.startResolutionForResult(
-                    this, MapaActivity.REQUEST_ERROR_PLAY_SERVICES)
+                    this, InformationActivity.REQUEST_ERROR_PLAY_SERVICES)
             } catch (e: IntentSender.SendIntentException) {
                 e.printStackTrace()
             }
@@ -212,7 +185,21 @@ class MapaActivity : AppCompatActivity() {
             .getErrorDialog(this, errorCode, REQUEST_ERROR_PLAY_SERVICES)
             ?.show()
     }
-
+    private fun searchAddress() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
+        viewModel.searchAddress(binding.edtSearch.text.toString())
+    }
+    private fun showProgress(message: String) {
+        binding.layoutLoading.txtProgress.text = message
+        binding.layoutLoading.llProgress.visibility = View.VISIBLE
+    }
+    private fun hidePogress() {
+        binding.layoutLoading.llProgress.visibility = View.GONE
+    }
+    private fun showAddressListDialog(addresses: List<Address>) {
+        AddressListFragment.newInstance(addresses).show(supportFragmentManager, null)
+    }
 
     companion object {
         private const val REQUEST_ERROR_PLAY_SERVICES = 1
@@ -220,7 +207,4 @@ class MapaActivity : AppCompatActivity() {
         private const val REQUEST_CHECK_GPS = 3
         private const val EXTRA_GPS_DIALOG = "gpsDialogIsOpen"
     }
-
-
-
 }

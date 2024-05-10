@@ -1,7 +1,7 @@
 package com.rn.sosnow.viewmodels
-
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.PendingIntent
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -15,21 +15,16 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
+import com.rn.sosnow.GeofenceDb
+import com.rn.sosnow.GeofenceInfo
 import com.rn.sosnow.RouteHttp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
+import kotlinx.coroutines.*
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-
-
-class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
+class MapViewModel(app: Application) : AndroidViewModel(app), CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
@@ -38,67 +33,17 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
     private val locationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(getContext())
     }
+    private val geofenceDb: GeofenceDb by lazy { GeofenceDb(getContext()) }
 
     private val connectionStatus = MutableLiveData<GoogleApiConnectionStatus>()
     private val currentLocationError = MutableLiveData<LocationError>()
+    private val addresses = MutableLiveData<List<Address>?>()
+    private val loading = MutableLiveData<Boolean>()
+    private val loadingRoute = MutableLiveData<Boolean>()
+    private val currentLocation = MutableLiveData<LatLng>()
 
     private val mapState = MutableLiveData<MapState>().apply {
         value = MapState()
-    }
-    private val addresses = MutableLiveData<List<Address>?>()
-    private val loading = MutableLiveData<Boolean>()
-
-    private val loadingRoute = MutableLiveData<Boolean>()
-
-    fun getAddresses(): LiveData<List<Address>?>{
-        return addresses
-    }
-
-    fun isLoading(): LiveData<Boolean>{
-        return loading
-    }
-
-    fun isLoadingRoute(): LiveData<Boolean> {
-        return loadingRoute
-    }
-
-    fun searchAddress(s:String){
-        launch {
-            loading.value = true
-            val geoCoder = Geocoder(getContext(), Locale.getDefault())
-            addresses.value = withContext(Dispatchers.IO){
-                geoCoder.getFromLocationName(s, 10)
-            }
-
-            loading.value = false
-        }
-    }
-
-    fun clearSearchAddressResult(){
-        addresses.value = null
-    }
-
-    fun setDestination(latLng: LatLng){
-        addresses.value = null
-        mapState.value = mapState.value?.copy(destination = latLng)
-        loadRoute()
-    }
-
-    private fun loadRoute() {
-        if (mapState.value != null) {
-            val orig = mapState.value?.origin
-            val dest = mapState.value?.destination
-            if (orig != null && dest != null) {
-                launch {
-                    loadingRoute.value = true
-                    val route = withContext(Dispatchers.IO) {
-                        RouteHttp.searchRoute(orig, dest)
-                    }
-                    mapState.value = mapState.value?.copy(route = route)
-                    loadingRoute.value = false
-                }
-            }
-        }
     }
 
     override fun onCleared() {
@@ -106,19 +51,33 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
         job.cancel()
     }
 
-
-    fun getConnectionStatus(): LiveData<GoogleApiConnectionStatus>{
+    fun getConnectionStatus(): LiveData<GoogleApiConnectionStatus> {
         return connectionStatus
     }
 
-    fun getCurrentLocationError(): LiveData<LocationError>{
+    fun getCurrentLocationError(): LiveData<LocationError> {
         return currentLocationError
     }
 
-    fun getMapState(): LiveData<MapState>{
+    fun getMapState(): LiveData<MapState> {
         return mapState
     }
 
+    fun getAddresses(): LiveData<List<Address>?> {
+        return addresses
+    }
+
+    fun isLoading(): LiveData<Boolean> {
+        return loading
+    }
+
+    fun isLoadingRoute(): LiveData<Boolean> {
+        return loadingRoute
+    }
+
+    fun getCurrentLocation(): LiveData<LatLng> {
+        return currentLocation
+    }
 
     fun connectGoogleApiClient() {
         if (googleApiClient == null) {
@@ -142,7 +101,6 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
         googleApiClient?.connect()
     }
 
-
     fun disconnectGoogleApiClient() {
         connectionStatus.value = GoogleApiConnectionStatus(false)
         if (googleApiClient != null && googleApiClient?.isConnected == true) {
@@ -152,45 +110,41 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
 
     @SuppressLint("MissingPermission")
     private suspend fun loadLastLocation(): Boolean = suspendCoroutine { continuation ->
-       fun updateOriginByLocation(location: Location){
-           val latLng = LatLng(location.latitude, location.longitude)
-           mapState.value = mapState.value?.copy(origin = latLng)
-           continuation.resume(true)
-       }
-
-        fun waitForLocation(){
+        fun updateOriginByLocation(location: Location) {
+            val latLng = LatLng(location.latitude, location.longitude)
+            mapState.value = mapState.value?.copy(origin = latLng)
+            continuation.resume(true)
+        }
+        fun waitForLocation() {
             val locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(5 * 1000)
                 .setFastestInterval(1 * 1000)
             locationClient.requestLocationUpdates(locationRequest,
-                object: LocationCallback(){
+                object : LocationCallback() {
                     override fun onLocationResult(p0: LocationResult) {
                         super.onLocationResult(p0)
                         locationClient.removeLocationUpdates(this)
                         val location = p0?.lastLocation
-                        if(location != null){
+                        if (location != null) {
                             updateOriginByLocation(location)
-                        }else{
+                        } else {
                             continuation.resume(false)
                         }
                     }
                 }, null)
         }
-
         locationClient.lastLocation
             .addOnSuccessListener { location ->
-                if(location == null){
+                if (location == null) {
                     waitForLocation()
-                }else{
+                } else {
                     updateOriginByLocation(location)
                 }
             }
-
-            .addOnFailureListener{
+            .addOnFailureListener {
                 waitForLocation()
             }
-
             .addOnCanceledListener {
                 continuation.resume(false)
             }
@@ -216,20 +170,21 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
             }
     }
 
-    fun requestLocation(){
+    fun requestLocation() {
         launch {
-            currentLocationError.value = try{
+            currentLocationError.value = try {
                 checkGpsStatus()
-                val success = withContext(Dispatchers.Default){loadLastLocation()}
-                if(success){
+                val success = withTimeout(2000) { loadLastLocation() }
+                if (success) {
+                    startLocationUpdates()
                     null
-                }else{
+                } else {
                     LocationError.ErrorLocationUnavailable
                 }
-            }catch (timeout: TimeoutCancellationException){
+            } catch (timeout: TimeoutCancellationException) {
                 LocationError.ErrorLocationUnavailable
-            }catch (exception: ApiException){
-                when(exception.statusCode){
+            } catch (exception: ApiException) {
+                when (exception.statusCode) {
                     LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
                         LocationError.GpsDisabled(exception as ResolvableApiException)
                     LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE ->
@@ -241,26 +196,106 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
         }
     }
 
+    fun searchAddress(s: String) {
+        launch {
+            loading.value = true
+            val geoCoder = Geocoder(getContext(), Locale.getDefault())
+            addresses.value = withContext(Dispatchers.IO) {
+                geoCoder.getFromLocationName(s, 10)
+            }
+            loading.value = false
+        }
+    }
+
+    fun clearSearchAddressResult() {
+        addresses.value = null
+    }
+
+    fun setDestination(latLng: LatLng) {
+        addresses.value = null
+        mapState.value = mapState.value?.copy(destination = latLng)
+        loadRoute()
+    }
+
+    private fun loadRoute() {
+        if (mapState.value != null) {
+            val orig = mapState.value?.origin
+            val dest = mapState.value?.destination
+            if (orig != null && dest != null) {
+                launch {
+                    loadingRoute.value = true
+                    val route = withContext(Dispatchers.IO) {
+                        RouteHttp.searchRoute(orig, dest)
+                    }
+                    mapState.value = mapState.value?.copy(route = route)
+                    loadingRoute.value = false
+                }
+            }
+        }
+    }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(p0: LocationResult) {
+            val location = p0?.lastLocation
+            if (location != null) {
+                currentLocation.value = LatLng(location.latitude, location.longitude)
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdates() {
+        val locationRequest = LocationRequest.create()
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(5 * 1000)
+            .setFastestInterval(1 * 1000)
+        locationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+    }
+
+    fun stopLocationUpdates() {
+        LocationServices.getFusedLocationProviderClient(getContext())
+            .removeLocationUpdates(locationCallback)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun setGeofence(pit: PendingIntent, latLng: LatLng) {
+        if (googleApiClient?.isConnected == true) {
+            val geofenceInfo = GeofenceInfo("1",
+                latLng.latitude, latLng.longitude,
+                500f, // em metros
+                Geofence.NEVER_EXPIRE,
+                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+            val request = GeofencingRequest.Builder()
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofences(listOf(geofenceInfo.getGeofence()))
+                .build()
+            LocationServices.getGeofencingClient(getContext())
+                .addGeofences(request, pit)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        geofenceDb.saveGeofence(geofenceInfo)
+                        mapState.value = mapState.value?.copy(geofenceInfo = geofenceInfo)
+                    }
+                }
+        }
+    }
 
     private fun getContext() = getApplication<Application>()
 
+    // Data classes -----------
     data class MapState(
-        var origin: LatLng? = null,
+        val origin: LatLng? = null,
         val destination: LatLng? = null,
-        val route:List<LatLng>? = null
-
+        val route: List<LatLng>? = null,
+        val geofenceInfo: GeofenceInfo? = null
     )
-
     data class GoogleApiConnectionStatus(
         val success: Boolean,
         val connectionResult: ConnectionResult? = null
     )
-
-
-    sealed class LocationError{
-        object ErrorLocationUnavailable: LocationError()
+    sealed class LocationError {
+        object ErrorLocationUnavailable : LocationError()
         data class GpsDisabled(val exception: ResolvableApiException): LocationError()
         object GpsSettingUnavailable: LocationError()
     }
-
 }

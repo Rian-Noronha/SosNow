@@ -2,11 +2,11 @@ package com.rn.sosnow
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item?.itemId){
             R.id.action_map ->
-               startActivity(Intent(this, MapaActivity::class.java))
+               startActivity(Intent(this, InformationActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
