@@ -2,6 +2,7 @@ package com.rn.sosnow
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.rn.sosnow.viewmodels.MapViewModel
 
 class AppMapFragment : SupportMapFragment() {
@@ -75,6 +77,17 @@ class AppMapFragment : SupportMapFragment() {
                 area.include(destination)
             }
 
+            val route = mapState.route
+            if (!route.isNullOrEmpty()) {
+                val polylineOptions = PolylineOptions()
+                    .addAll(route)
+                    .width(5f)
+                    .color(Color.RED)
+                    .visible(true)
+                addPolyline(polylineOptions)
+                route.forEach { area.include(it) }
+            }
+
             if(origin != null){
                 if(destination != null){
                     animateCamera(CameraUpdateFactory.newLatLngBounds(area.build(), 50))
@@ -82,6 +95,7 @@ class AppMapFragment : SupportMapFragment() {
                     animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 17f))
                 }
             }
+
 
         }
     }

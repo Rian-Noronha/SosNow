@@ -15,6 +15,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
+import com.rn.sosnow.RouteHttp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -47,6 +48,7 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
     private val addresses = MutableLiveData<List<Address>?>()
     private val loading = MutableLiveData<Boolean>()
 
+    private val loadingRoute = MutableLiveData<Boolean>()
 
     fun getAddresses(): LiveData<List<Address>?>{
         return addresses
@@ -54,6 +56,10 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
 
     fun isLoading(): LiveData<Boolean>{
         return loading
+    }
+
+    fun isLoadingRoute(): LiveData<Boolean> {
+        return loadingRoute
     }
 
     fun searchAddress(s:String){
@@ -75,6 +81,24 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
     fun setDestination(latLng: LatLng){
         addresses.value = null
         mapState.value = mapState.value?.copy(destination = latLng)
+        loadRoute()
+    }
+
+    private fun loadRoute() {
+        if (mapState.value != null) {
+            val orig = mapState.value?.origin
+            val dest = mapState.value?.destination
+            if (orig != null && dest != null) {
+                launch {
+                    loadingRoute.value = true
+                    val route = withContext(Dispatchers.IO) {
+                        RouteHttp.searchRoute(orig, dest)
+                    }
+                    mapState.value = mapState.value?.copy(route = route)
+                    loadingRoute.value = false
+                }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -217,11 +241,13 @@ class MapViewModel(app: Application): AndroidViewModel(app), CoroutineScope {
         }
     }
 
+
     private fun getContext() = getApplication<Application>()
 
     data class MapState(
         var origin: LatLng? = null,
-        val destination: LatLng? = null
+        val destination: LatLng? = null,
+        val route:List<LatLng>? = null
 
     )
 

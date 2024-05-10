@@ -62,6 +62,8 @@ android {
     val services_location = "21.2.0"
     val coroutines_version = "1.3.9"
     val coroutines_core_version = "1.5.0"
+    val maps_utils_version = "2.3.0"
+    val okhttp_version = "4.10.0"
 
 dependencies {
 
@@ -102,6 +104,10 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_core_version")
+
+    implementation("com.google.maps.android:android-maps-utils:$maps_utils_version")
+
+    implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
 
     testImplementation("junit:junit:$junit_version")
     androidTestImplementation("androidx.test.ext:junit:$test_junit_version")
