@@ -1,4 +1,4 @@
-package com.rn.sosnow
+package com.rn.sosnow.map
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import okhttp3.OkHttpClient

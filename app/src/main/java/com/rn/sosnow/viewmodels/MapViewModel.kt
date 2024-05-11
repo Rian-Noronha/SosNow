@@ -1,7 +1,6 @@
 package com.rn.sosnow.viewmodels
 import android.annotation.SuppressLint
 import android.app.Application
-import android.app.PendingIntent
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -15,9 +14,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
-import com.rn.sosnow.GeofenceDb
-import com.rn.sosnow.GeofenceInfo
-import com.rn.sosnow.RouteHttp
+import com.rn.sosnow.map.RouteHttp
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -33,7 +30,6 @@ class MapViewModel(app: Application) : AndroidViewModel(app), CoroutineScope {
     private val locationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(getContext())
     }
-    private val geofenceDb: GeofenceDb by lazy { GeofenceDb(getContext()) }
 
     private val connectionStatus = MutableLiveData<GoogleApiConnectionStatus>()
     private val currentLocationError = MutableLiveData<LocationError>()
@@ -201,7 +197,7 @@ class MapViewModel(app: Application) : AndroidViewModel(app), CoroutineScope {
             loading.value = true
             val geoCoder = Geocoder(getContext(), Locale.getDefault())
             addresses.value = withContext(Dispatchers.IO) {
-                geoCoder.getFromLocationName(s, 10)
+                geoCoder.getFromLocationName(s, 1)
             }
             loading.value = false
         }
@@ -257,28 +253,6 @@ class MapViewModel(app: Application) : AndroidViewModel(app), CoroutineScope {
             .removeLocationUpdates(locationCallback)
     }
 
-    @SuppressLint("MissingPermission")
-    fun setGeofence(pit: PendingIntent, latLng: LatLng) {
-        if (googleApiClient?.isConnected == true) {
-            val geofenceInfo = GeofenceInfo("1",
-                latLng.latitude, latLng.longitude,
-                500f, // em metros
-                Geofence.NEVER_EXPIRE,
-                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
-            val request = GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofences(listOf(geofenceInfo.getGeofence()))
-                .build()
-            LocationServices.getGeofencingClient(getContext())
-                .addGeofences(request, pit)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        geofenceDb.saveGeofence(geofenceInfo)
-                        mapState.value = mapState.value?.copy(geofenceInfo = geofenceInfo)
-                    }
-                }
-        }
-    }
 
     private fun getContext() = getApplication<Application>()
 
@@ -287,7 +261,6 @@ class MapViewModel(app: Application) : AndroidViewModel(app), CoroutineScope {
         val origin: LatLng? = null,
         val destination: LatLng? = null,
         val route: List<LatLng>? = null,
-        val geofenceInfo: GeofenceInfo? = null
     )
     data class GoogleApiConnectionStatus(
         val success: Boolean,

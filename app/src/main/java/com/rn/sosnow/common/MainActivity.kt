@@ -1,7 +1,6 @@
-package com.rn.sosnow
+package com.rn.sosnow.common
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.rn.sosnow.view.ContactAdapter
+import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ActivityMainBinding
 import com.rn.sosnow.model.Contact
 import com.rn.sosnow.viewmodels.ContactListViewModel
@@ -42,18 +43,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateList(contacts: List<Contact>){
         val numerberOfColumns = 2
-        binding.rvBooks.layoutManager = GridLayoutManager(this, numerberOfColumns)
-        binding.rvBooks.adapter = ContactAdapter(contacts){ contact ->
-            val phoneNumber = contact.number
-            val name = contact.name
-
-            val intent = Intent(Intent.ACTION_DIAL).apply {
-                data = Uri.parse("tel:$phoneNumber")
-            }
+        binding.rvContacts.layoutManager = GridLayoutManager(this, numerberOfColumns)
+        binding.rvContacts.adapter = ContactAdapter(contacts){ contact ->
+           val intent = Intent(this, InformationActivity::class.java).apply {
+               putExtra("CONTACT", contact)
+           }
 
             startActivity(intent)
-
-            Toast.makeText(this, "Ligando para -> $name", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -1,10 +1,11 @@
-package com.rn.sosnow
+package com.rn.sosnow.view
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ItemContactBinding
 import com.rn.sosnow.model.Contact
 

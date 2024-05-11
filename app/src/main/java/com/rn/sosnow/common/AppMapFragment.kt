@@ -1,6 +1,4 @@
-package com.rn.sosnow
-import android.app.PendingIntent
-import android.content.Intent
+package com.rn.sosnow.common
 import android.graphics.Color
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -9,12 +7,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.rn.sosnow.R
 import com.rn.sosnow.viewmodels.MapViewModel
 
 class AppMapFragment : SupportMapFragment() {
@@ -36,9 +33,6 @@ class AppMapFragment : SupportMapFragment() {
             mapType = GoogleMap.MAP_TYPE_NORMAL
             uiSettings.isMapToolbarEnabled = false
             uiSettings.isZoomControlsEnabled = true
-            setOnMapLongClickListener { latLng ->
-                onMapLongClick(latLng)
-            }
         }
         viewModel.getMapState()
             .observe(this, Observer { mapState ->
@@ -100,23 +94,7 @@ class AppMapFragment : SupportMapFragment() {
                     animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 17f))
                 }
             }
-            val geofenceInfo = mapState.geofenceInfo
-            if (geofenceInfo != null) {
-                val latLng = LatLng(geofenceInfo.latitude, geofenceInfo.longitude)
-                addCircle(CircleOptions()
-                    .strokeWidth(2f)
-                    .fillColor(0x990000FF.toInt())
-                    .center(latLng)
-                    .radius(geofenceInfo.radius.toDouble())
-                )
-            }
         }
     }
 
-    private fun onMapLongClick(latLng: LatLng) {
-        val pit = PendingIntent.getBroadcast(requireContext(), 0,
-            Intent(requireContext(), GeofenceReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
-        viewModel.setGeofence(pit, latLng)
-    }
 }

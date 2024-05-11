@@ -1,4 +1,4 @@
-package com.rn.sosnow
+package com.rn.sosnow.view
 import android.app.Dialog
 import android.content.DialogInterface
 import android.location.Address
@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.model.LatLng
+import com.rn.sosnow.R
 import com.rn.sosnow.viewmodels.MapViewModel
 
 class AddressListFragment : DialogFragment() {

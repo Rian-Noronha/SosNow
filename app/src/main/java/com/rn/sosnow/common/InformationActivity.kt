@@ -1,13 +1,13 @@
-package com.rn.sosnow
+package com.rn.sosnow.common
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Address
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +16,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.rn.sosnow.view.AddressListFragment
+import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ActivityInformationBinding
+import com.rn.sosnow.model.Contact
 import com.rn.sosnow.viewmodels.MapViewModel
 
 
@@ -31,11 +34,20 @@ class InformationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityInformationBinding
 
+    private lateinit var contact: Contact
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInformationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        contact = (intent.getSerializableExtra("CONTACT") as? Contact)!!
         isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG) ?: false
+
+        configureInformationLayout()
+        binding.fabCall.setOnClickListener{
+            call()
+        }
+
     }
     override fun onStart() {
         super.onStart()
@@ -48,6 +60,23 @@ class InformationActivity : AppCompatActivity() {
         super.onStop()
         viewModel.disconnectGoogleApiClient()
         viewModel.stopLocationUpdates()
+    }
+
+    private fun call(){
+        if (contact.number.isNotEmpty()) {
+            val uri = Uri.parse("tel:${contact.number}")
+            val intent = Intent(Intent.ACTION_DIAL, uri)
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Número de telefone inválido.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun configureInformationLayout(){
+        binding.txtContactName.text = contact.name
+        binding.txtContactAddress.text = contact.address
+        binding.txtContactDescription.text = contact.description
+        binding.txtContactNumber.text = contact.number
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -104,7 +133,7 @@ class InformationActivity : AppCompatActivity() {
         viewModel.isLoading()
             .observe(this, Observer { value ->
                 if (value != null) {
-                    binding.btnSearch.isEnabled = !value
+                    binding.btnTraceRoute.isEnabled = !value
                     if (value) {
                         showProgress(getString(R.string.map_msg_search_address))
                     } else {
@@ -121,7 +150,7 @@ class InformationActivity : AppCompatActivity() {
         viewModel.isLoadingRoute()
             .observe(this, Observer { value ->
                 if (value != null) {
-                    binding.btnSearch.isEnabled = !value
+                    binding.btnTraceRoute.isEnabled = !value
                     if (value) {
                         showProgress(getString(R.string.map_msg_search_route))
                     } else {
@@ -130,7 +159,7 @@ class InformationActivity : AppCompatActivity() {
                 }
             })
 
-        binding.btnSearch.setOnClickListener {
+        binding.btnTraceRoute.setOnClickListener {
             searchAddress()
         }
     }
@@ -143,7 +172,8 @@ class InformationActivity : AppCompatActivity() {
                     if (!isGpsDialogOpened) {
                         isGpsDialogOpened = true
                         error.exception.startResolutionForResult(
-                            this, InformationActivity.REQUEST_CHECK_GPS)
+                            this, REQUEST_CHECK_GPS
+                        )
                     }
                 }
                 is MapViewModel.LocationError.GpsSettingUnavailable ->
@@ -155,7 +185,8 @@ class InformationActivity : AppCompatActivity() {
         if (!hasPermission()) {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_PERMISSIONS)
+                REQUEST_PERMISSIONS
+            )
             return
         }
         viewModel.requestLocation()
@@ -164,7 +195,8 @@ class InformationActivity : AppCompatActivity() {
         if (result.hasResolution()) {
             try {
                 result.startResolutionForResult(
-                    this, InformationActivity.REQUEST_ERROR_PLAY_SERVICES)
+                    this, REQUEST_ERROR_PLAY_SERVICES
+                )
             } catch (e: IntentSender.SendIntentException) {
                 e.printStackTrace()
             }
@@ -186,9 +218,7 @@ class InformationActivity : AppCompatActivity() {
             ?.show()
     }
     private fun searchAddress() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
-        viewModel.searchAddress(binding.edtSearch.text.toString())
+        viewModel.searchAddress("${contact.destinationLatitude}  ${contact.destinationLongitude}")
     }
     private fun showProgress(message: String) {
         binding.layoutLoading.txtProgress.text = message
