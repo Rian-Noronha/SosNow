@@ -2,17 +2,15 @@ package com.rn.sosnow.common
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.rn.sosnow.view.ContactAdapter
 import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ActivityMainBinding
 import com.rn.sosnow.model.Contact
+import com.rn.sosnow.view.ContactAdapter
 import com.rn.sosnow.viewmodels.ContactListViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -51,19 +49,6 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.principal, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item?.itemId){
-            R.id.action_map ->
-               startActivity(Intent(this, InformationActivity::class.java))
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 

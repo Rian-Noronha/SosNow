@@ -16,10 +16,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.rn.sosnow.view.AddressListFragment
 import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ActivityInformationBinding
 import com.rn.sosnow.model.Contact
+import com.rn.sosnow.view.AddressListFragment
 import com.rn.sosnow.viewmodels.MapViewModel
 
 
@@ -42,6 +42,10 @@ class InformationActivity : AppCompatActivity() {
         setContentView(binding.root)
         contact = (intent.getSerializableExtra("CONTACT") as? Contact)!!
         isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG) ?: false
+
+        val toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = contact.name
 
         configureInformationLayout()
         binding.fabCall.setOnClickListener{

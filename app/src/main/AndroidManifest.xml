@@ -26,6 +26,7 @@
             android:exported="false" />
         <activity
             android:name=".common.InformationActivity"
+            android:theme="@style/AppThemeToInformation"
             android:exported="false" />
         <activity
             android:name=".common.SplashScreen"

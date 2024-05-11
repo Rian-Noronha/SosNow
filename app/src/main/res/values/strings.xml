@@ -14,4 +14,9 @@
     <string name="map_current_location">Local atual</string>
     <string name="map_msg_search_route">Traçando rota…</string>
     <string name="unknown_error">Erro desconhecido</string>
+    <string name="scroll_view">Scroll View da tela</string>
+    <string name="img_route">Ícone para definir rota</string>
+    <string name="img_recycler">Imagem do contato</string>
+    <string name="img_splash">Imagem de abertura do app</string>
+    <string name="fab">Botão flutuante pra fazer ligação</string>
 </resources>
