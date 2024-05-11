@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Address
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -205,7 +206,11 @@ class InformationActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         } else {
-            showPlayServicesErrorMessage(result.errorCode)
+            if (result.errorCode == ConnectionResult.NETWORK_ERROR) {
+                Toast.makeText(this, R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            } else {
+                showPlayServicesErrorMessage(result.errorCode)
+            }
         }
     }
     private fun hasPermission(): Boolean {
@@ -222,8 +227,19 @@ class InformationActivity : AppCompatActivity() {
             ?.show()
     }
     private fun searchAddress() {
-        viewModel.searchAddress("${contact.destinationLatitude}  ${contact.destinationLongitude}")
+        if (isNetworkAvailable()) {
+            viewModel.searchAddress("${contact.destinationLatitude}  ${contact.destinationLongitude}")
+        } else {
+            Toast.makeText(this, R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+        }
     }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
     private fun showProgress(message: String) {
         binding.layoutLoading.txtProgress.text = message
         binding.layoutLoading.llProgress.visibility = View.VISIBLE

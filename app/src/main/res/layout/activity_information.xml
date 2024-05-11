@@ -1,112 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:contentDescription="@string/scroll_view"
-    >
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    tools:context=".common.InformationActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        tools:context=".common.InformationActivity">
+        android:background="@color/gray"
+        >
 
-        <com.google.android.material.appbar.AppBarLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/gray"
-            >
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/gray"/>
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/gray"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        </com.google.android.material.appbar.AppBarLayout>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentMap"
+        android:name="com.rn.sosnow.common.AppMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@color/light_gray"
+        android:layout_marginBottom="16dp" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentMap"
-            android:name="com.rn.sosnow.common.AppMapFragment"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:contentDescription="@string/scroll_view"
+        >
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:background="@color/light_gray"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/txtContactName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            tools:text="Contact Name" />
+            <ImageButton
+                android:id="@+id/btnTraceRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_routes"
+                android:contentDescription="@string/img_route"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"
+                />
 
-        <TextView
-            android:id="@+id/txtContactAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:textColor="#757575"
-            android:textSize="16sp"
-            tools:text="Contact Address" />
+            <TextView
+                android:id="@+id/txtContactName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                tools:text="Contact Name" />
 
-        <TextView
-            android:id="@+id/txtContactDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:textColor="#757575"
-            android:textSize="16sp"
-            tools:text="Contact Description" />
+            <TextView
+                android:id="@+id/txtContactAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:textColor="#757575"
+                android:textSize="16sp"
+                tools:text="Contact Address" />
 
-        <ImageButton
-            android:id="@+id/btnTraceRoute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:padding="8dp"
-            android:src="@drawable/ic_routes"
-            android:contentDescription="@string/img_route"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"
-            />
+            <TextView
+                android:id="@+id/txtContactDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:textColor="#757575"
+                android:textSize="16sp"
+                tools:text="Contact Description" />
 
-        <TextView
-            android:id="@+id/txtContactNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/gray"
-            android:padding="8dp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            tools:ignore="TextContrastCheck"
-            tools:text="Contact Number" />
 
-        <include
-            android:id="@+id/layoutLoading"
-            layout="@layout/layout_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            <TextView
+                android:id="@+id/txtContactNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/gray"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                tools:ignore="TextContrastCheck"
+                tools:text="Contact Number" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabCall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/colorAccent"
-            android:tint="@android:color/white"
-            app:fabSize="normal"
-            app:srcCompat="@drawable/ic_call"
-            tools:ignore="SpeakableTextPresentCheck"
-            android:contentDescription="@string/fab" />
+            <include
+                android:id="@+id/layoutLoading"
+                layout="@layout/layout_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
 
-    </LinearLayout>
-</ScrollView>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabCall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="16dp"
+                android:backgroundTint="@color/colorAccent"
+                android:tint="@android:color/white"
+                app:fabSize="normal"
+                app:srcCompat="@drawable/ic_call"
+                tools:ignore="SpeakableTextPresentCheck"
+                android:contentDescription="@string/fab" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</LinearLayout>

@@ -6,7 +6,7 @@ import okhttp3.Request
 import org.json.JSONObject
 
 object RouteHttp {
-    private const val key = "AIzaSyAbE0ADJpvOT2YHY4GnF4sqlyXqc0bNSBc"
+    private const val key = "AIzaSyDQC7IjbyoaHX0mhDpLA6o2j-Q6FyB_U_w"
     fun searchRoute(orig: LatLng, dest: LatLng): List<LatLng>? {
         try {
 
@@ -32,7 +32,7 @@ object RouteHttp {
                 latLngList.addAll(PolyUtil.decode(points))
             }
             return latLngList
-        } catch (e: Exception) {
+        } catch (e: Exception){
             e.printStackTrace()
         }
         return null
