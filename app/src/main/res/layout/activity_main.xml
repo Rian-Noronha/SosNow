@@ -5,9 +5,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.rn.sosnow.common.MainActivity">
 
+    <include
+        android:id="@+id/includeToolbarMain"
+        layout="@layout/toolbar_main"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvContacts"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        />
 
 </FrameLayout>

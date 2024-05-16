@@ -15,11 +15,10 @@
         android:background="@color/gray"
         >
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/gray"/>
+        <include
+            android:id="@+id/includeToolbarInformation"
+            layout="@layout/toolbar_information"
+            />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -41,6 +40,7 @@
         >
 
         <LinearLayout
+            android:padding="5dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -51,18 +51,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
-
-            <ImageButton
-                android:id="@+id/btnTraceRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
-                android:src="@drawable/ic_routes"
-                android:contentDescription="@string/img_route"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"
-                />
 
             <TextView
                 android:id="@+id/txtContactName"
@@ -81,6 +69,17 @@
                 android:textColor="#757575"
                 android:textSize="16sp"
                 tools:text="Contact Address" />
+            <ImageButton
+                android:id="@+id/btnTraceRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/open_route"
+                android:contentDescription="@string/img_route"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"
+                />
 
             <TextView
                 android:id="@+id/txtContactDescription"
@@ -92,31 +91,78 @@
                 tools:text="Contact Description" />
 
 
-            <TextView
-                android:id="@+id/txtContactNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@color/gray"
-                android:padding="8dp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                tools:ignore="TextContrastCheck"
-                tools:text="Contact Number" />
+            <LinearLayout
+                android:background="@drawable/rounded_number"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="90dp">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabCall"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/txtNum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="2dp"
+                    android:layout_margin="2dp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    tools:ignore="TextContrastCheck"
+                    android:text="@string/number" />
+
+                <TextView
+                    android:id="@+id/txtContactNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="2dp"
+                    android:layout_margin="2dp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textSize="25sp"
+                    tools:ignore="TextContrastCheck"
+                    tools:text="Contact Number" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="16dp"
-                android:backgroundTint="@color/colorAccent"
-                android:tint="@android:color/white"
-                app:fabSize="normal"
-                app:srcCompat="@drawable/ic_call"
-                tools:ignore="SpeakableTextPresentCheck"
-                android:contentDescription="@string/fab" />
+                android:gravity="end"
+                android:layout_marginVertical="60dp">
+
+                <ImageButton
+                    android:id="@+id/btnBackToMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="8dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/back_button"
+                    android:contentDescription="@string/img_route"
+                    android:layout_weight="1"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/btnCallNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="8dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/call_number"
+                    android:contentDescription="@string/img_route"
+                    android:layout_weight="1"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
 

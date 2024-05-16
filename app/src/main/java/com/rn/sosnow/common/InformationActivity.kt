@@ -44,13 +44,18 @@ class InformationActivity : AppCompatActivity() {
         contact = (intent.getSerializableExtra("CONTACT") as? Contact)!!
         isGpsDialogOpened = savedInstanceState?.getBoolean(EXTRA_GPS_DIALOG) ?: false
 
-        val toolbar = binding.toolbar
+        val toolbar = binding.includeToolbarInformation.toolbar
+        binding.includeToolbarInformation.txtTitleInformation.text = contact.name
         setSupportActionBar(toolbar)
-        supportActionBar?.title = contact.name
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         configureInformationLayout()
-        binding.fabCall.setOnClickListener{
+        binding.btnCallNumber.setOnClickListener{
             call()
+        }
+
+        binding.btnBackToMain.setOnClickListener{
+            backToMain()
         }
 
     }
@@ -75,6 +80,10 @@ class InformationActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Número de telefone inválido.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun backToMain(){
+        startActivity(Intent(this, MainActivity::class.java))
     }
 
     private fun configureInformationLayout(){

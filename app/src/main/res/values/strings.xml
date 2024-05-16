@@ -20,4 +20,5 @@
     <string name="img_splash">Imagem de abertura do app</string>
     <string name="fab">Botão flutuante pra fazer ligação</string>
     <string name="no_internet_connection">Você tá sem internet</string>
+    <string name="number">Número</string>
 </resources>

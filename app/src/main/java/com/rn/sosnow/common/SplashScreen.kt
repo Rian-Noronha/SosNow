@@ -12,13 +12,26 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         supportActionBar?.hide()
 
+        showSplash()
+
+    }
+
+
+    private fun showSplash(){
         Handler().postDelayed({
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }, 1000)
-
     }
+
+    override fun onRestart() {
+        super.onRestart()
+       finish()
+    }
+
+
+
+
 }
