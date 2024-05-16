@@ -83,7 +83,7 @@ class InformationActivity : AppCompatActivity() {
     }
 
     private fun backToMain(){
-        startActivity(Intent(this, MainActivity::class.java))
+       finish()
     }
 
     private fun configureInformationLayout(){
