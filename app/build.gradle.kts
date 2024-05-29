@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -42,6 +43,14 @@ android {
         buildConfig = true
     }
 
+    secrets{
+        propertiesFileName = "secrets.properties"
+        defaultPropertiesFileName = "local.defaults.properties"
+        ignoreList.add("keyToIgnore")
+        ignoreList.add("sdk.*")
+    }
+
+
     externalNativeBuild{
         cmake{
             path ("src/main/cpp/CMakeLists.txt")
@@ -76,9 +85,14 @@ android {
     val maps_utils_version = "2.3.0"
     val okhttp_version = "4.10.0"
     val gson_version = "2.10.1"
-    val cloud_secretmanager = "2.44.0"
+    val secrets_version = "2.0.1"
+
+
 
 dependencies {
+
+    implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:$secrets_version")
+
     implementation("androidx.core:core-ktx:$core_version")
     implementation("androidx.appcompat:appcompat:$app_compat_version")
     implementation("com.google.android.material:material:$material_version")
