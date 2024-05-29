@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+native-lib.cpp
+CMakeLists.txt

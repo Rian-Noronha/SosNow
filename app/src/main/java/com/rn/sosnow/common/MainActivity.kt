@@ -9,12 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.rn.sosnow.R
 import com.rn.sosnow.databinding.ActivityMainBinding
+import com.rn.sosnow.map.Keys
 import com.rn.sosnow.model.Contact
 import com.rn.sosnow.view.ContactAdapter
 import com.rn.sosnow.viewmodels.ContactListViewModel
 
 class MainActivity : AppCompatActivity() {
-
     private val viewModel: ContactListViewModel by lazy{
         ViewModelProvider(this).get(ContactListViewModel::class.java)
     }
@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar = binding.includeToolbarMain.toolbarMain
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
         loadContacts()
     }
 
@@ -50,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvContacts.adapter = ContactAdapter(contacts){ contact ->
            val intent = Intent(this, InformationActivity::class.java).apply {
                putExtra("CONTACT", contact)
+               putExtra("key", Keys.apiKey())
            }
 
             startActivity(intent)

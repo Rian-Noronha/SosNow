@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SOS NOW"
 include(":app")
+include(":app:nativelib")

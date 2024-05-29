@@ -6,10 +6,9 @@ import okhttp3.Request
 import org.json.JSONObject
 
 object RouteHttp {
-    private const val key = "AIzaSyDQC7IjbyoaHX0mhDpLA6o2j-Q6FyB_U_w"
+    private val key = Keys.apiKey()
     fun searchRoute(orig: LatLng, dest: LatLng): List<LatLng>? {
         try {
-
             val urlRoute = "https://maps.googleapis.com/maps/api/directions/json?origin=${orig.latitude},${orig.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=true&mode=driving&key=$key"
             val client = OkHttpClient()
             val request = Request.Builder()

@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -18,7 +17,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -41,16 +39,20 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        buildConfig = true
     }
 
-    secrets{
-        propertiesFileName = "secrets.properties"
-        defaultPropertiesFileName = "local.defaults.properties"
-        ignoreList.add("keyToIgnore")
-        ignoreList.add("sdk.*")
+    externalNativeBuild{
+        cmake{
+            path ("src/main/cpp/CMakeLists.txt")
+        }
     }
+    ndkVersion = "27.0.11718014 rc1"
 
 }
+
+
+
 
     val glide_version = "4.16.0"
     val bom_version = "32.8.1"
@@ -74,10 +76,9 @@ android {
     val maps_utils_version = "2.3.0"
     val okhttp_version = "4.10.0"
     val gson_version = "2.10.1"
-    val secrets_version = "2.0.1"
+    val cloud_secretmanager = "2.44.0"
 
 dependencies {
-
     implementation("androidx.core:core-ktx:$core_version")
     implementation("androidx.appcompat:appcompat:$app_compat_version")
     implementation("com.google.android.material:material:$material_version")
@@ -88,6 +89,7 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:$glide_version")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("androidx.annotation:annotation:1.8.0")
     kapt("com.github.bumptech.glide:compiler:$glide_version")
 
     implementation(platform("com.google.firebase:firebase-bom:$bom_version"))
@@ -121,9 +123,11 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
     implementation("com.google.code.gson:gson:$gson_version")
 
-    implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:$secrets_version")
-
     testImplementation("junit:junit:$junit_version")
     androidTestImplementation("androidx.test.ext:junit:$test_junit_version")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_core_version")
+
+
 }
+
+
