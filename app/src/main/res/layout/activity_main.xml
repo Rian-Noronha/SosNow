@@ -5,6 +5,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.rn.sosnow.common.MainActivity">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/logo_sos"
+        android:scaleType="centerInside"
+        android:layout_gravity="center"/>
+
     <include
         android:id="@+id/includeToolbarMain"
         layout="@layout/toolbar_main"
