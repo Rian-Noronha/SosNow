@@ -7,4 +7,5 @@
     <color name="black">#000000</color>
     <color name="red">#FF0000</color>
     <color name="gray">#978C8C</color>
+    <color name="backgroundMainRoot">#E8E8E8</color>
 </resources>

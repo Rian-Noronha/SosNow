@@ -1,49 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".common.InformationActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/myAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/gray"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <include
             android:id="@+id/includeToolbarInformation"
-            layout="@layout/toolbar_information"
-            />
+            layout="@layout/toolbar_information" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentMap"
         android:name="com.rn.sosnow.common.AppMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@color/light_gray"
+        app:layout_constraintTop_toBottomOf="@id/myAppBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="H,16:9"
         android:layout_marginBottom="16dp" />
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:fillViewport="true"
         android:contentDescription="@string/scroll_view"
-        >
+        app:layout_constraintTop_toBottomOf="@id/fragmentMap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:padding="5dp"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <include
                 android:id="@+id/layoutLoading"
@@ -69,6 +74,7 @@
                 android:textColor="#757575"
                 android:textSize="16sp"
                 tools:text="Contact Address" />
+
             <ImageButton
                 android:id="@+id/btnTraceRoute"
                 android:layout_width="wrap_content"
@@ -78,8 +84,7 @@
                 android:padding="8dp"
                 android:src="@drawable/open_route"
                 android:contentDescription="@string/img_route"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"
-                />
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/txtContactDescription"
@@ -90,49 +95,41 @@
                 android:textSize="16sp"
                 tools:text="Contact Description" />
 
-
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_number"
                 android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="90dp">
+                android:padding="8dp">
 
                 <TextView
                     android:id="@+id/txtNum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="2dp"
-                    android:layout_margin="2dp"
+                    android:text="@string/number"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="@android:color/white"
-                    android:textSize="15sp"
-                    tools:ignore="TextContrastCheck"
-                    android:text="@string/number" />
+                    tools:ignore="TextContrastCheck" />
 
                 <TextView
                     android:id="@+id/txtContactNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="2dp"
-                    android:layout_margin="2dp"
+                    android:text="Contact Number"
+                    android:textSize="25sp"
                     android:textStyle="bold"
                     android:textColor="@android:color/white"
-                    android:textSize="25sp"
-                    tools:ignore="TextContrastCheck"
-                    tools:text="Contact Number" />
-
+                    tools:ignore="TextContrastCheck" />
             </LinearLayout>
 
-
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
                 android:gravity="end"
-                android:layout_marginVertical="5dp">
+                android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/btnBackToMain"
@@ -141,10 +138,8 @@
                     android:layout_marginTop="16dp"
                     android:background="?attr/selectableItemBackground"
                     android:padding="8dp"
-                    android:layout_gravity="center_vertical"
                     android:src="@drawable/back_button"
                     android:contentDescription="@string/img_route"
-                    android:layout_weight="1"
                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                 <ImageButton
@@ -154,18 +149,10 @@
                     android:layout_marginTop="16dp"
                     android:background="?attr/selectableItemBackground"
                     android:padding="8dp"
-                    android:layout_gravity="center_vertical"
                     android:src="@drawable/call_number"
                     android:contentDescription="@string/img_route"
-                    android:layout_weight="1"
                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-
             </LinearLayout>
-
-
         </LinearLayout>
-
-
     </ScrollView>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
